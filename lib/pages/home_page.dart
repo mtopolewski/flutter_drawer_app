@@ -9,8 +9,30 @@ import 'green_page.dart';
 import 'red_page.dart';
 import 'yellow_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    duration: const Duration(milliseconds: 500),
+    vsync: this,
+  )..reset();
+
+  late final Animation<double> _animation = CurvedAnimation(
+    parent: _controller,
+    curve: Curves.easeIn,
+  );
+
+  @override
+  void initState() {
+    _controller.reset();
+    _controller.forward();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,24 +86,48 @@ class HomePage extends StatelessWidget {
         builder: (context, state) {
           switch (state.navigationType) {
             case NavigationType.pageRed:
-              return const RedPage();
+              return FadeTransition(
+                opacity: _animation,
+                child: const RedPage(),
+              );
             case NavigationType.pageYellow:
-              return const YellowPage();
+              return FadeTransition(
+                opacity: _animation,
+                child: const YellowPage(),
+              );
             case NavigationType.pageGreen:
-              return const GreenPage();
+              return FadeTransition(
+                opacity: _animation,
+                child: const GreenPage(),
+              );
             case NavigationType.pageBlue:
-              return const BluePage();
+              return FadeTransition(
+                opacity: _animation,
+                child: const BluePage(),
+              );
             default:
-              return const RedPage();
+              return FadeTransition(
+                opacity: _animation,
+                child: const RedPage(),
+              );
           }
         },
       ),
     );
   }
 
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   void _navigationItemClick(
       NavigationType navigationType, BuildContext context) {
-    BlocProvider.of<NavigationDrawerBloc>(context)
-        .add(NavigateToEvent(navigationType));
+    _controller.reset();
+    _controller.forward();
+    BlocProvider.of<NavigationDrawerBloc>(context).add(
+      NavigateToEvent(navigationType),
+    );
   }
 }
