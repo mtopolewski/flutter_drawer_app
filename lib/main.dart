@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_drawer_app/pages/home_page.dart';
+
+import 'blocs/navigation_drawer_bloc.dart';
 
 void main() {
   runApp(const App());
@@ -10,8 +13,15 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: HomePage(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<NavigationDrawerBloc>(
+          create: (BuildContext context) => NavigationDrawerBloc(),
+        ),
+      ],
+      child: const MaterialApp(
+        home: HomePage(),
+      ),
     );
   }
 }
