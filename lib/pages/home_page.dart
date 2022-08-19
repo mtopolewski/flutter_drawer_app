@@ -88,6 +88,29 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 Navigator.pop(context);
               },
             ),
+            const ListTile(
+              title: Text("Languages:"),
+            ),
+            Column(
+              children: <Widget>[
+                ListTile(
+                  title: const Text('pl'),
+                  leading: Radio<String>(
+                    value: "pl",
+                    groupValue: "en", //"state.translation",
+                    onChanged: (String? value) {},
+                  ),
+                ),
+                ListTile(
+                  title: const Text('en'),
+                  leading: Radio<String>(
+                    value: "en",
+                    groupValue: "en",
+                    onChanged: (String? value) {},
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
