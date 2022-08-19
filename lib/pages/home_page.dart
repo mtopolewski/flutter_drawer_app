@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../app_localizations.dart';
 import '../blocs/events/navigation_drawer_event.dart';
 import '../blocs/navigation_drawer_bloc.dart';
 import '../blocs/states/navigation_drawer_states.dart';
+import '../helpers/page_name_mapper.dart';
 import 'blue_page.dart';
 import 'green_page.dart';
 import 'red_page.dart';
@@ -37,7 +39,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Drawer app")),
+      appBar: AppBar(
+        title: BlocBuilder<NavigationDrawerBloc, NavigationDrawerState>(
+          builder: (context, state) => Text(AppLocalizations.of(context)!
+              .translate(PageNameMapper.map[state.navigationType]!)!),
+        ),
+      ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -52,28 +59,30 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ),
             ),
             ListTile(
-              title: const Text('Red'),
+              title: Text(AppLocalizations.of(context)!.translate("RedPage")!),
               onTap: () {
                 _navigationItemClick(NavigationType.pageRed, context);
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              title: const Text('Yellow'),
+              title:
+                  Text(AppLocalizations.of(context)!.translate("YellowPage")!),
               onTap: () {
                 _navigationItemClick(NavigationType.pageYellow, context);
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              title: const Text('Green'),
+              title:
+                  Text(AppLocalizations.of(context)!.translate("GreenPage")!),
               onTap: () {
                 _navigationItemClick(NavigationType.pageGreen, context);
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              title: const Text('Blue'),
+              title: Text(AppLocalizations.of(context)!.translate("BluePage")!),
               onTap: () {
                 _navigationItemClick(NavigationType.pageBlue, context);
                 Navigator.pop(context);
