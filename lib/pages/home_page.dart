@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../app_localizations.dart';
+import '../blocs/app_language_cubit.dart';
 import '../blocs/events/navigation_drawer_event.dart';
 import '../blocs/navigation_drawer_bloc.dart';
+import '../blocs/states/app_language_state.dart';
 import '../blocs/states/navigation_drawer_states.dart';
 import '../helpers/page_name_mapper.dart';
 import 'blue_page.dart';
@@ -91,26 +93,29 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             const ListTile(
               title: Text("Languages:"),
             ),
-            Column(
-              children: <Widget>[
-                ListTile(
-                  title: const Text('pl'),
-                  leading: Radio<String>(
-                    value: "pl",
-                    groupValue: "en", //"state.translation",
-                    onChanged: (String? value) {},
+            BlocBuilder<AppLanguageCubit, AppLanguageState>(
+                builder: (context, state) {
+              return Column(
+                children: <Widget>[
+                  ListTile(
+                    title: const Text('pl'),
+                    leading: Radio<String>(
+                      value: "pl",
+                      groupValue: state.appLocale?.languageCode,
+                      onChanged: (_) => _localizationItemClick("pl"),
+                    ),
                   ),
-                ),
-                ListTile(
-                  title: const Text('en'),
-                  leading: Radio<String>(
-                    value: "en",
-                    groupValue: "en",
-                    onChanged: (String? value) {},
+                  ListTile(
+                    title: const Text('en'),
+                    leading: Radio<String>(
+                      value: "en",
+                      groupValue: state.appLocale?.languageCode,
+                      onChanged: (_) => _localizationItemClick("en"),
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              );
+            }),
           ],
         ),
       ),
@@ -161,5 +166,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     BlocProvider.of<NavigationDrawerBloc>(context).add(
       NavigateToEvent(navigationType),
     );
+
+    context.read<NavigationDrawerBloc>().add(
+          NavigateToEvent(navigationType),
+        );
   }
+
+  void _localizationItemClick(String local) =>
+      context.read<AppLanguageCubit>().changeLanguage(Locale(local));
 }
