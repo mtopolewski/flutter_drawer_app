@@ -40,6 +40,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    var locale = Localizations.localeOf(context);
+    BlocProvider.of<AppLanguageCubit>(context).getStoredLocale(locale);
     return Scaffold(
       appBar: AppBar(
         title: BlocBuilder<NavigationDrawerBloc, NavigationDrawerState>(
@@ -48,78 +50,103 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       ),
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-              child: Icon(
-                Icons.flutter_dash,
-                size: 50,
-              ),
-            ),
-            ListTile(
-              title: Text(AppLocalizations.of(context)!.translate("RedPage")!),
-              onTap: () {
-                _navigationItemClick(NavigationType.pageRed, context);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title:
-                  Text(AppLocalizations.of(context)!.translate("YellowPage")!),
-              onTap: () {
-                _navigationItemClick(NavigationType.pageYellow, context);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title:
-                  Text(AppLocalizations.of(context)!.translate("GreenPage")!),
-              onTap: () {
-                _navigationItemClick(NavigationType.pageGreen, context);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text(AppLocalizations.of(context)!.translate("BluePage")!),
-              onTap: () {
-                _navigationItemClick(NavigationType.pageBlue, context);
-                Navigator.pop(context);
-              },
-            ),
-            const ListTile(
-              title: Text("Languages:"),
-            ),
-            BlocBuilder<AppLanguageCubit, AppLanguageState>(
-                builder: (context, state) {
-              return Column(
-                children: <Widget>[
-                  ListTile(
-                    title: const Text('pl'),
-                    leading: Radio<String>(
-                      value: "pl",
-                      groupValue: state.appLocale?.languageCode,
-                      onChanged: (_) => _localizationItemClick("pl"),
-                    ),
-                  ),
-                  ListTile(
-                    title: const Text('en'),
-                    leading: Radio<String>(
-                      value: "en",
-                      groupValue: state.appLocale?.languageCode,
-                      onChanged: (_) => _localizationItemClick("en"),
-                    ),
-                  ),
-                ],
-              );
-            }),
-          ],
-        ),
+        child: _getDrawerItems(),
       ),
-      body: BlocBuilder<NavigationDrawerBloc, NavigationDrawerState>(
+      body: _getBody(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  _navigationItemClick(NavigationType navigationType, BuildContext context) {
+    _controller.reset();
+    _controller.forward();
+    BlocProvider.of<NavigationDrawerBloc>(context).add(
+      NavigateToEvent(navigationType),
+    );
+
+    context.read<NavigationDrawerBloc>().add(
+          NavigateToEvent(navigationType),
+        );
+  }
+
+  _localizationItemClick(String local) =>
+      context.read<AppLanguageCubit>().changeLanguage(Locale(local));
+
+  _getDrawerItems() => ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          const DrawerHeader(
+            decoration: BoxDecoration(
+              color: Colors.blue,
+            ),
+            child: Icon(
+              Icons.flutter_dash,
+              size: 50,
+            ),
+          ),
+          ListTile(
+            title: Text(AppLocalizations.of(context)!.translate("RedPage")!),
+            onTap: () {
+              _navigationItemClick(NavigationType.pageRed, context);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: Text(AppLocalizations.of(context)!.translate("YellowPage")!),
+            onTap: () {
+              _navigationItemClick(NavigationType.pageYellow, context);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: Text(AppLocalizations.of(context)!.translate("GreenPage")!),
+            onTap: () {
+              _navigationItemClick(NavigationType.pageGreen, context);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: Text(AppLocalizations.of(context)!.translate("BluePage")!),
+            onTap: () {
+              _navigationItemClick(NavigationType.pageBlue, context);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: Text(AppLocalizations.of(context)!.translate("Languages")!),
+          ),
+          BlocBuilder<AppLanguageCubit, AppLanguageState>(
+              builder: (context, state) {
+            return Column(
+              children: <Widget>[
+                ListTile(
+                  title: const Text('pl'),
+                  leading: Radio<String>(
+                    value: "pl",
+                    groupValue: state.appLocale?.languageCode,
+                    onChanged: (_) => _localizationItemClick("pl"),
+                  ),
+                ),
+                ListTile(
+                  title: const Text('en'),
+                  leading: Radio<String>(
+                    value: "en",
+                    groupValue: state.appLocale?.languageCode,
+                    onChanged: (_) => _localizationItemClick("en"),
+                  ),
+                ),
+              ],
+            );
+          }),
+        ],
+      );
+
+  _getBody() => BlocBuilder<NavigationDrawerBloc, NavigationDrawerState>(
         builder: (context, state) {
           switch (state.navigationType) {
             case NavigationType.pageRed:
@@ -149,29 +176,5 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               );
           }
         },
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _navigationItemClick(
-      NavigationType navigationType, BuildContext context) {
-    _controller.reset();
-    _controller.forward();
-    BlocProvider.of<NavigationDrawerBloc>(context).add(
-      NavigateToEvent(navigationType),
-    );
-
-    context.read<NavigationDrawerBloc>().add(
-          NavigateToEvent(navigationType),
-        );
-  }
-
-  void _localizationItemClick(String local) =>
-      context.read<AppLanguageCubit>().changeLanguage(Locale(local));
+      );
 }
