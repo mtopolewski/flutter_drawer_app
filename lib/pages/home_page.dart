@@ -4,6 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/events/navigation_drawer_event.dart';
 import '../blocs/navigation_drawer_bloc.dart';
 import '../blocs/states/navigation_drawer_states.dart';
+import 'blue_page.dart';
+import 'green_page.dart';
+import 'red_page.dart';
+import 'yellow_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -57,7 +61,20 @@ class HomePage extends StatelessWidget {
         ),
       ),
       body: BlocBuilder<NavigationDrawerBloc, NavigationDrawerState>(
-        builder: (context, state) => Text(state.navigationType.toString()),
+        builder: (context, state) {
+          switch (state.navigationType) {
+            case NavigationType.pageRed:
+              return const RedPage();
+            case NavigationType.pageYellow:
+              return const YellowPage();
+            case NavigationType.pageGreen:
+              return const GreenPage();
+            case NavigationType.pageBlue:
+              return const BluePage();
+            default:
+              return const RedPage();
+          }
+        },
       ),
     );
   }
